@@ -25,10 +25,23 @@ Simple server dashboard for the purpose of providing health status and quick cli
   - ⚠️ **Gray icon**: Service is offline or unreachable
 - **Smart sub-labels**: Shows "Online", "Offline", or "Healthy" status text
 
-### Environment Detection
-- **Development mode** (localhost) - Uses `http://localhost` endpoints
-- **Production mode** - Uses `https://192.168.1.41` endpoints
-- Automatically switches based on `window.location.hostname`
+## Environment Detection
+
+The dashboard automatically detects whether it's running in **Development** or **Production** mode based on the hostname:
+
+- **Development Mode** (`localhost`, `127.0.0.1`, `::1`):
+  - Services are checked against `http://localhost:PORT`
+  - Example: `http://localhost:9443` for Portainer
+
+- **Production Mode** (`192.168.x.x`, domain names, etc.):
+  - Services are checked against `https://192.168.1.41:PORT`
+  - Example: `https://192.168.1.41:9443` for Portainer
+
+When you access the dashboard at `192.168.1.41:3000`, it will use production URLs to check the actual services on `192.168.1.41`, not `localhost`.
+
+**Console Output:**
+- Open browser console (F12) to see environment detection logs
+- Shows: Environment, Current hostname, and configured service base URL
 
 ### Time Display
 - Live clock in the header
@@ -145,3 +158,29 @@ server-monit/
 ├── style.css       # (Optional - currently using Tailwind CDN)
 └── README.md       # This file
 ```
+
+## Troubleshooting
+
+### Services Show as "Offline"
+
+1. **Check service is actually running**: Open the service URL directly in your browser
+2. **Check browser console** (F12) for error messages
+3. **Verify CORS settings**: Services need to allow cross-origin requests
+4. **Check firewall**: Ensure ports are open (9443, 8081, 32400, 6881)
+5. **Test locally**: Try accessing `http://192.168.1.41:9443` from another device on the network
+
+### Dashboard Won't Load
+
+1. **Check `npx serve .` is running**: `http://192.168.1.41:3000` should be accessible
+2. **Check HTML references**: Ensure `app.js` is in the same directory as `index.html`
+
+### CORS Errors
+
+If you see CORS errors in the console, some services may be blocking the health checks. The dashboard uses `no-cors` mode which only checks if the service responds (status 200) without returning the actual response body.
+
+### Adding Docker Health Checks
+
+Currently using HTTP-based health checks for simplicity. To add Docker API health monitoring:
+- Requires serving from a browser with Docker socket access
+- Would need `http://unix:/var/run/docker.sock:/` accessible
+- More complex setup but provides container health status

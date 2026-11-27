@@ -59,17 +59,26 @@ const services = {
 };
 
 // Determine if we're in development mode
+// Development: localhost, 127.0.0.1, ::1, or IPv4-mapped IPv6 addresses
+// Production: Any other hostname/IP (including 192.168.x.x when served from the server itself)
 const isDevelopment = window.location.hostname === 'localhost' || 
                       window.location.hostname === '127.0.0.1' ||
-                      window.location.hostname === SERVICE_ENDPOINTS.development;
+                      window.location.hostname === '::1' ||
+                      /127\./.test(window.location.hostname);
 
-// Override URLs for development
+console.log('Environment:', isDevelopment ? 'Development (localhost)' : 'Production (192.168.1.41)');
+console.log('Current hostname:', window.location.hostname);
+console.log('Service base URL:', isDevelopment ? SERVICE_ENDPOINTS.development : SERVICE_ENDPOINTS.production);
+
+// Override URLs for development - replace production base URL with localhost
 Object.values(services).forEach(service => {
     if (service.url.includes(SERVICE_ENDPOINTS.production)) {
         service.url = SERVICE_ENDPOINTS.development + service.url.replace(SERVICE_ENDPOINTS.production, '');
         service.link = SERVICE_ENDPOINTS.development + service.link.replace(SERVICE_ENDPOINTS.production, '');
     }
 });
+
+console.log('Service URLs configured for:', isDevelopment ? 'localhost' : '192.168.1.41');
 
 /**
  * Check service health via HTTP HEAD request
@@ -198,10 +207,6 @@ function initDashboard() {
     // Update time immediately and every second
     updateTime();
     setInterval(updateTime, 1000);
-    
-    console.log('Dashboard initialized');
-    console.log('Environment:', isDevelopment ? 'Development' : 'Production');
-    console.log('Service endpoints:', isDevelopment ? 'localhost' : '192.168.1.41');
 }
 
 // Initialize when DOM is ready
