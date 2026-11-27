@@ -1,95 +1,131 @@
 /**
  * Service Monitor Dashboard - JavaScript
  * Handles service health checks and time updates
+ * 
+ * Configuration is loaded from config.json for easy customization
  */
 
-// Configuration: Service URLs for production server (192.168.1.41)
-// Override these if serving from a different server
-const SERVICE_ENDPOINTS = {
-    production: 'https://192.168.1.41',
-    development: 'http://localhost' // For local development
-};
-
-// Service configuration with URLs and custom styles
-const services = {
-    'portainer': { 
-        container: 'portainer',
-        url: SERVICE_ENDPOINTS.production + ':9443',
-        label: 'Portainer',
-        subLabel: 'Docker Dashboard',
-        icon: 'fa-brands fa-docker',
-        iconClass: 'text-red-400',
-        link: SERVICE_ENDPOINTS.production + ':9443',
-        statusClass: 'bg-green-900 text-green-300',
-        iconColor: 'text-red-400'
+// Configuration defaults (fallback if config.json fails to load)
+const DEFAULT_CONFIG = {
+    server: {
+        ip: '192.168.1.41',
+        protocol: 'https'
     },
-    'searxng': { 
-        container: 'searxng',
-        url: SERVICE_ENDPOINTS.production + ':8081',
-        label: 'SearXNG',
-        subLabel: 'Search Engine',
-        icon: 'fa-solid fa-magnifying-glass',
-        iconClass: 'text-red-400',
-        link: SERVICE_ENDPOINTS.production + ':8081',
-        statusClass: 'bg-green-900 text-green-300',
-        iconColor: 'text-red-400'
-    },
-    'plex': { 
-        container: 'plex',
-        url: SERVICE_ENDPOINTS.production + ':32400',
-        label: 'Plex Media',
-        subLabel: 'Movies & TV',
-        icon: 'fa-solid fa-film',
-        iconClass: 'text-green-400',
-        link: SERVICE_ENDPOINTS.production + ':32400/web',
-        statusClass: 'bg-green-900 text-green-300',
-        iconColor: 'text-green-400'
-    },
-    'transmission': { 
-        container: 'transmission',
-        url: SERVICE_ENDPOINTS.production + ':6881',
-        label: 'Transmission',
-        subLabel: 'Torrent Client',
-        icon: 'fa-solid fa-bolt',
-        iconClass: 'text-yellow-400',
-        link: SERVICE_ENDPOINTS.production + ':6881/web',
-        statusClass: 'bg-green-900 text-green-300',
-        iconColor: 'text-yellow-400'
+    services: {
+        'portainer': {
+            name: 'Portainer',
+            subLabel: 'Docker Dashboard',
+            icon: 'fa-brands fa-docker',
+            iconColor: 'text-red-400',
+            port: '9443',
+            link: '9443',
+            statusClass: 'bg-green-900 text-green-300'
+        },
+        'searxng': {
+            name: 'SearXNG',
+            subLabel: 'Search Engine',
+            icon: 'fa-solid fa-magnifying-glass',
+            iconColor: 'text-red-400',
+            port: '8081',
+            link: '8081',
+            statusClass: 'bg-green-900 text-green-300'
+        },
+        'plex': {
+            name: 'Plex Media',
+            subLabel: 'Movies & TV',
+            icon: 'fa-solid fa-film',
+            iconColor: 'text-green-400',
+            port: '32400',
+            link: '32400/web',
+            statusClass: 'bg-green-900 text-green-300'
+        },
+        'transmission': {
+            name: 'Transmission',
+            subLabel: 'Torrent Client',
+            icon: 'fa-solid fa-bolt',
+            iconColor: 'text-yellow-400',
+            port: '6881',
+            link: '6881/web',
+            statusClass: 'bg-green-900 text-green-300'
+        }
     }
 };
 
-// Determine if we're in development mode
-// Development: localhost, 127.0.0.1, ::1, or IPv4-mapped IPv6 addresses
-// Production: Any other hostname/IP (including 192.168.x.x when served from the server itself)
-const isDevelopment = window.location.hostname === 'localhost' || 
-                      window.location.hostname === '127.0.0.1' ||
-                      window.location.hostname === '::1' ||
-                      /127\./.test(window.location.hostname);
+let currentConfig = null;
 
-console.log('Environment:', isDevelopment ? 'Development (localhost)' : 'Production (192.168.1.41)');
-console.log('Current hostname:', window.location.hostname);
-console.log('Service base URL:', isDevelopment ? SERVICE_ENDPOINTS.development : SERVICE_ENDPOINTS.production);
-
-// Override URLs for development - replace production base URL with localhost
-Object.values(services).forEach(service => {
-    if (service.url.includes(SERVICE_ENDPOINTS.production)) {
-        service.url = SERVICE_ENDPOINTS.development + service.url.replace(SERVICE_ENDPOINTS.production, '');
-        service.link = SERVICE_ENDPOINTS.development + service.link.replace(SERVICE_ENDPOINTS.production, '');
+/**
+ * Load configuration from config.json
+ */
+async function loadConfig() {
+    try {
+        // Try to load config.json
+        const response = await fetch('config.json', {
+            mode: 'no-cors',
+            cache: 'default'
+        });
+        
+        // Use no-cors mode - we just need to know if it exists and is accessible
+        if (response.status === 0) {
+            console.log('config.json not accessible, using defaults');
+            return DEFAULT_CONFIG;
+        }
+        
+        // If CORS is an issue, fall back to defaults
+        const text = await response.text();
+        const config = JSON.parse(text);
+        
+        console.log('✅ Loaded config.json');
+        return config;
+        
+    } catch (error) {
+        console.log('⚠️ Could not load config.json, using defaults:', error.message);
+        return DEFAULT_CONFIG;
     }
-});
+}
 
-console.log('Service URLs configured for:', isDevelopment ? 'localhost' : '192.168.1.41');
+/**
+ * Build service URL from config
+ */
+function buildServiceUrl(serviceKey, config) {
+    const server = config.server || DEFAULT_CONFIG.server;
+    const service = config.services[serviceKey] || DEFAULT_CONFIG.services[serviceKey];
+    
+    // Use protocol from service config, or default from server config
+    const protocol = service.protocol || server.defaultProtocol || 'https';
+    const ip = server.ip;
+    const port = service.port || '';
+    const linkPath = service.link || '';
+    
+    return {
+        url: `${protocol}://${ip}${port ? ':' + port : ''}${linkPath ? '/' + linkPath : ''}`,
+        link: `${protocol}://${ip}${port ? ':' + port : ''}${linkPath ? '/' + linkPath : ''}`
+    };
+}
+
+/**
+ * Determine if we're in development mode
+ * Development: localhost, 127.0.0.1, ::1
+ * Production: Any other hostname/IP
+ */
+function isDevelopmentMode() {
+    return window.location.hostname === 'localhost' || 
+           window.location.hostname === '127.0.0.1' ||
+           window.location.hostname === '::1' ||
+           /127\./.test(window.location.hostname);
+}
 
 /**
  * Check service health via HTTP HEAD request
  * @param {string} serviceKey - Service identifier
+ * @param {Object} serviceConfig - Service configuration
  * @returns {Object} Status information
  */
 async function checkServiceHealth(serviceKey, serviceConfig) {
     try {
+        const urlInfo = buildServiceUrl(serviceKey, currentConfig);
+        
         // Make HEAD request to check if service is responding
-        // Using no-cors mode to handle CORS restrictions
-        const response = await fetch(serviceConfig.url, { 
+        const response = await fetch(urlInfo.url, { 
             method: 'HEAD',
             mode: 'no-cors', 
             signal: AbortSignal.timeout(5000) // 5 second timeout
@@ -109,7 +145,7 @@ async function checkServiceHealth(serviceKey, serviceConfig) {
         // Service is responding
         return { 
             status: 'RUNNING', 
-            iconClass: serviceConfig.iconClass, 
+            iconClass: serviceConfig.iconColor, 
             badgeClass: serviceConfig.statusClass, 
             badgeText: 'RUNNING',
             subLabel: 'Healthy'
@@ -130,7 +166,7 @@ async function checkServiceHealth(serviceKey, serviceConfig) {
  * Update all service status badges and icons in the DOM
  */
 async function updateServiceStatus() {
-    for (const [key, service] of Object.entries(services)) {
+    for (const [key, service] of Object.entries(currentConfig.services)) {
         try {
             const status = await checkServiceHealth(key, service);
             
@@ -151,7 +187,7 @@ async function updateServiceStatus() {
                 if (iconElement) {
                     if (status.status === 'RUNNING') {
                         // Service is running, use configured icon color
-                        iconElement.className = `fa-${service.icon.split(' ').pop()} text-3xl ${service.iconClass}`;
+                        iconElement.className = `fa-${service.icon.split(' ').pop()} text-3xl ${service.iconColor}`;
                     } else {
                         // Service is offline, use gray icon
                         iconElement.className = `fa-${service.icon.split(' ').pop()} text-3xl ${status.iconClass}`;
@@ -197,7 +233,16 @@ function updateTime() {
 /**
  * Initialize the dashboard
  */
-function initDashboard() {
+async function initDashboard() {
+    // Load configuration
+    currentConfig = await loadConfig();
+    
+    // Log configuration for debugging
+    console.log('=== Service Monitor Dashboard ===');
+    console.log('Server IP:', currentConfig.server.ip);
+    console.log('Environment:', isDevelopmentMode() ? 'Development (localhost)' : 'Production (192.168.1.41)');
+    console.log('Configured services:', Object.keys(currentConfig.services).length);
+    
     // Run first health check immediately
     updateServiceStatus();
     

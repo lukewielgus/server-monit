@@ -1,0 +1,48 @@
+{
+  "server": {
+    "ip": "192.168.1.41",
+    "defaultProtocol": "https"
+  },
+  "services": {
+    "portainer": {
+      "name": "Portainer",
+      "subLabel": "Docker Dashboard",
+      "icon": "fa-brands fa-docker",
+      "iconColor": "text-red-400",
+      "port": "9443",
+      "link": "9443",
+      "protocol": "https",
+      "statusClass": "bg-green-900 text-green-300"
+    },
+    "searxng": {
+      "name": "SearXNG",
+      "subLabel": "Search Engine",
+      "icon": "fa-solid fa-magnifying-glass",
+      "iconColor": "text-red-400",
+      "port": "8081",
+      "link": "8081",
+      "protocol": "http",
+      "statusClass": "bg-green-900 text-green-300"
+    },
+    "plex": {
+      "name": "Plex Media",
+      "subLabel": "Movies & TV",
+      "icon": "fa-solid fa-film",
+      "iconColor": "text-green-400",
+      "port": "32400",
+      "link": "32400/web",
+      "protocol": "http",
+      "statusClass": "bg-green-900 text-green-300"
+    },
+    "transmission": {
+      "name": "Transmission",
+      "subLabel": "Torrent Client",
+      "icon": "fa-solid fa-bolt",
+      "iconColor": "text-yellow-400",
+      "port": "6881",
+      "link": "6881/web",
+      "protocol": "http",
+      "statusClass": "bg-green-900 text-green-300"
+    }
+  }
+}
