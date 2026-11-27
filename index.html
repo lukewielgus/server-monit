@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Home Server Dashboard</title>
+        <!-- Tailwind CSS for styling -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <!-- FontAwesome for Icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            body { background-color: #0f172a; color: #e2e8f0; }
+            .card { transition: transform 0.2s; }
+            .card:hover { transform: translateY(-5px); }
+            .icon-box { @apply bg-blue-900 rounded-lg p-6 text-center shadow-lg; }
+            .search-icon { color: #3b82f6; }
+        </style>
+    </head>
+    <body class="min-h-screen p-6 flex flex-col items-center">
+
+        <!-- HEADER: Date, Time, Server Status -->
+        <header class="w-full max-w-5xl flex justify-between items-center mb-10 border-b border-slate-700 pb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-100"><i class="fa-solid fa-server mr-2"></i>My Home Server</h1>
+                <p class="text-slate-400 mt-1">Status: <span class="text-green-400 font-semibold">Online</span></p>
+            </div>
+            <div class="text-right">
+                <p id="date-time" class="text-2xl font-mono text-cyan-400">00:00:00</p>
+                <p id="current-date" class="text-slate-400">Loading...</p>
+            </div>
+        </header>
+
+        <!-- SERVICES GRID -->
+        <main class="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <!-- CARD 1: Portainer -->
+            <a href="https://192.168.1.41:9443" target="_blank" class="card block bg-slate-800 p-6 rounded-xl border border-slate-700" data-service="portainer">
+                <div class="flex items-center justify-between mb-4">
+                    <i class="fa-brands fa-docker text-3xl text-red-400"></i>
+                    <span class="text-xs font-bold bg-green-900 text-green-300 px-2 py-1 rounded">RUNNING</span>
+                </div>
+                <h2 class="text-xl font-bold mb-1">Portainer</h2>
+                <p class="text-slate-400 text-sm mb-4">Docker Dashboard</p>
+                <div class="flex items-center text-sm text-blue-400">
+                    <i class="fa-solid fa-arrow-right mr-2"></i> Open Dashboard
+                </div>
+            </a>
+
+            <!-- CARD 2: SearXNG -->
+            <a href="https://192.168.1.41:8081" target="_blank" class="card block bg-slate-800 p-6 rounded-xl border border-slate-700" data-service="searxng">
+                <div class="flex items-center justify-between mb-4">
+                    <i class="fa-solid fa-magnifying-glass text-3xl text-red-400"></i>
+                    <span class="text-xs font-bold bg-green-900 text-green-300 px-2 py-1 rounded">RUNNING</span>
+                </div>
+                <h2 class="text-xl font-bold mb-1">SearXNG</h2>
+                <p class="text-slate-400 text-sm mb-4">Search Engine</p>
+                <div class="flex items-center text-sm text-blue-400">
+                    <i class="fa-solid fa-arrow-right mr-2"></i> Open Search
+                </div>
+            </a>
+
+            <!-- CARD 3: Plex Server -->
+            <a href="https://192.168.1.41:32400/web" target="_blank" class="card block bg-slate-800 p-6 rounded-xl border border-slate-700" data-service="plex">
+                <div class="flex items-center justify-between mb-4">
+                    <i class="fa-solid fa-film text-3xl text-green-400"></i>
+                    <span class="text-xs font-bold bg-green-900 text-green-300 px-2 py-1 rounded">RUNNING</span>
+                </div>
+                <h2 class="text-xl font-bold mb-1">Plex Media</h2>
+                <p class="text-slate-400 text-sm mb-4">Movies & TV</p>
+                <div class="flex items-center text-sm text-blue-400">
+                    <i class="fa-solid fa-arrow-right mr-2"></i> Open Dashboard
+                </div>
+            </a>
+
+            <!-- CARD 4: Bittorrent -->
+            <a href="https://192.168.1.41:6881/web" target="_blank" class="card block bg-slate-800 p-6 rounded-xl border border-slate-700" data-service="transmission">
+                <div class="flex items-center justify-between mb-4">
+                    <i class="fa-solid fa-bolt text-3xl text-yellow-400"></i>
+                    <span class="text-xs font-bold bg-green-900 text-green-300 px-2 py-1 rounded">RUNNING</span>
+                </div>
+                <h2 class="text-xl font-bold mb-1">Transmission</h2>
+                <p class="text-slate-400 text-sm mb-4">Torrent Client</p>
+                <div class="flex items-center text-sm text-blue-400">
+                    <i class="fa-solid fa-arrow-right mr-2"></i> Manage Downloads
+                </div>
+            </a>
+
+            <!-- CARD X: Placeholder / Future / Copy-Paste Template -->
+            <a href="#" class="card block bg-slate-800 p-6 rounded-xl border border-slate-700 opacity-50">
+                <div class="flex items-center justify-between mb-4">
+                    <i class="fa-solid fa-gears text-3xl text-slate-500"></i>
+                    <span class="text-xs font-bold bg-red-900 text-red-300 px-2 py-1 rounded">OFFLINE</span>
+                </div>
+                <h2 class="text-xl font-bold mb-1">Project X</h2>
+                <p class="text-slate-400 text-sm mb-4">In Development</p>
+                <div class="flex items-center text-sm text-slate-500">
+                    <i class="fa-solid fa-lock mr-2"></i> Locked
+                </div>
+            </a>
+
+        </main>
+
+        <!-- JAVASCRIPT REFERENCE -->
+        <script src="app.js"></script>
+    </body>
+</html>
