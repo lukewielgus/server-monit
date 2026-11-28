@@ -146,7 +146,7 @@ Some services require different protocols. If not specified, they'll use the `de
 | Portainer | 9443 | https | `9443` | `fa-brands fa-docker` | Red |
 | SearXNG | 8081 | http | `8081` | `fa-solid fa-magnifying-glass` | Red |
 | Plex Media | 32400 | http | `32400/web` | `fa-solid fa-film` | Green |
-| Transmission | 6881 | http | `6881/web` | `fa-solid fa-bolt` | Yellow |
+| qBittorent | 6881 | http | `6881/web` | `fa-solid fa-bolt` | Yellow |
 
 **Custom `statusClass`** (for the RUNNING badge):
 
@@ -155,7 +155,7 @@ Some services require different protocols. If not specified, they'll use the `de
 | Portainer | `bg-green-900 text-green-300` |
 | SearXNG | `bg-green-900 text-green-300` |
 | Plex Media | `bg-green-900 text-green-300` |
-| Transmission | `bg-green-900 text-green-300` |
+| qBittorent | `bg-green-900 text-green-300` |
 
 ## Adding New Services
 

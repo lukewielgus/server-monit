@@ -39,8 +39,8 @@ const DEFAULT_CONFIG = {
             link: '32400/web',
             statusClass: 'bg-green-900 text-green-300'
         },
-        'transmission': {
-            name: 'Transmission',
+        'qbittorent': {
+            name: 'qBittorent',
             subLabel: 'Torrent Client',
             icon: 'fa-solid fa-bolt',
             iconColor: 'text-yellow-400',
